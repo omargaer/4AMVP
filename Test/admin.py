@@ -5,7 +5,9 @@ from .models.companies_models import (
     Position,
     BranchOfficeType,
     BranchOfficeStatus,
-    BranchOffice
+    BranchOffice,
+    BranchOfficeLocation,
+    BranchOfficeSchedule
 )
 # TODO: регистрировать через декоратор @admin.register()
 admin.site.register(CompanyGroup)
@@ -14,4 +16,6 @@ admin.site.register(Position)
 admin.site.register(BranchOfficeType)
 admin.site.register(BranchOfficeStatus)
 admin.site.register(BranchOffice)
+admin.site.register(BranchOfficeLocation)
+admin.site.register(BranchOfficeSchedule)
 # Register your models here.

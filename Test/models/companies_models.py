@@ -1,6 +1,9 @@
 from django.db import models as models
-# from django.contrib.gis.db import models as gis_models
+# циклический импорт
+# from .user_models import Account, IndividualEntity
+
 # TODO: UniqueConstraint
+
 class CompanyGroup(models.Model):
     name = models.CharField(max_length=100,
                             verbose_name='Название группы компаний')
@@ -8,6 +11,10 @@ class CompanyGroup(models.Model):
                             null=True,
                             default=None,
                             verbose_name='Примечания')
+    decisionMaker = models.ManyToManyField('IndividualEntity',
+                                           through='CompanyGroupDecisionMaker',
+                                           related_name='decision_maker_in_company_groups',
+                                           verbose_name='ЛПР')
     def __str__(self):
         return self.name
 
@@ -16,6 +23,21 @@ class CompanyGroup(models.Model):
         verbose_name = "Группа компаний"
         verbose_name_plural = "Группы компаний"
 
+
+class CompanyGroupDecisionMaker(models.Model):
+    companyGroup = models.ForeignKey(CompanyGroup,
+                                     on_delete=models.RESTRICT,
+                                     verbose_name="Группа компаний")
+    decisionMaker = models.ForeignKey('IndividualEntity',
+                                      on_delete=models.RESTRICT,
+                                      verbose_name="ЛПР")
+    class Meta:
+        db_table = 'CompanyGroupDecisionMaker'
+        verbose_name = "M2M Группа компаний - ЛПР"
+        verbose_name_plural = "M2M Группа компаний - ЛПР"
+        # TODO: добавить ограничение уникальности
+
+
 class Company(models.Model):
     companyGroup = models.ForeignKey(CompanyGroup,
                                      on_delete=models.RESTRICT,
@@ -23,6 +45,10 @@ class Company(models.Model):
                                      null=True,
                                      default=None,
                                      verbose_name="Принадлежит к группе компаний")
+    decisionMaker = models.ManyToManyField('IndividualEntity',
+                                           through='CompanyDecisionMaker',
+                                           related_name='decision_maker_in_companies',
+                                           verbose_name='ЛПР')
     name = models.CharField(max_length=100,
                             null=False,
                             default='',
@@ -43,12 +69,26 @@ class Company(models.Model):
         verbose_name = "Компания"
         verbose_name_plural = "Компании"
 
+class CompanyDecisionMaker(models.Model):
+    company = models.ForeignKey(Company,
+                                on_delete=models.RESTRICT,
+                                verbose_name="Компания")
+    decisionMaker = models.ForeignKey('IndividualEntity',
+                                      on_delete=models.RESTRICT,
+                                      verbose_name="ЛПР")
+    class Meta:
+        db_table = 'CompanyDecisionMaker'
+        verbose_name = "M2M Компания - ЛПР"
+        verbose_name_plural = "M2M Компания - ЛПР"
+        # TODO: добавить ограничение уникальности
+
+
 class Position(models.Model):
     company = models.ForeignKey(Company,
                                 on_delete=models.SET_NULL,
                                 related_name='positions',
                                 null=True,
-                                verbose_name="Должности в компании",
+                                verbose_name="Компания",
                                 default=None)
     name = models.CharField(max_length=30,
                             null=False,
@@ -193,5 +233,18 @@ class BranchOfficeSchedule(models.Model):
         verbose_name_plural = "Расписания филиалов"
         unique_together = ('branchOffice', 'day_of_week')
 
+class AccountOfBranchEmployees(models.Model):
+    branchOffice = models.ForeignKey(BranchOffice,
+                                     on_delete=models.RESTRICT,
+                                     verbose_name='Филиал')
+    account = models.ForeignKey('Account',
+                                on_delete=models.RESTRICT,
+                                verbose_name='Учётная запись')
 
+    class Meta:
+        db_table = 'AccountOfBranchEmployees'
+        verbose_name = "M2M Учётка-Филиал"
+        verbose_name_plural = "M2M Учётка-Филиал"
+        # TODO: заменить на constraint
+        # unique_together = ('account', 'branch_office')
 #endregion Филиал

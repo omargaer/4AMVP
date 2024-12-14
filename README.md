@@ -5,11 +5,11 @@ cd 4AMVP
 ```
 ### Создание виртуального окружения:
 ```bash
-python -m venv venv
+python -m venv .venv
 ```
 ### Активация виртуального окружения
 ```bash
-venv\Scripts\activate
+..venv\Scripts\activate
 ```
 ### Установка зависимостей
 ```bash

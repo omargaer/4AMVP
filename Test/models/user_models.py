@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+# циклический импорт
+# from .companies_models import Position, BranchOffice, AccountOfBranchEmployees
 
 class IndividualEntity(models.Model):
     full_name = models.CharField(max_length=50,
@@ -34,14 +36,63 @@ class IndividualEntity(models.Model):
         verbose_name = "Физическое лицо"
         verbose_name_plural = "Физические лица"
 
+class AccountStatus(models.Model):
+    name = models.CharField(max_length=20,
+                            null=False,
+                            default='',
+                            verbose_name="Название статуса")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'AccountStatus'
+        verbose_name = "Статус учётной записи"
+        verbose_name_plural = "Статусы учётной записи"
+
+
+class AccountRole(models.Model):
+    name = models.CharField(max_length=25,
+                            null=False,
+                            default='',
+                            verbose_name="Название роли")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'AccountRole'
+        verbose_name = "Роль учётной записи"
+        verbose_name_plural = "Роли учётной записи"
+
+
 class Account(AbstractUser):
     # username, password наследуются от AbstractUser
-    individual = models.ForeignKey(IndividualEntity,
+    individual_entity = models.ForeignKey(IndividualEntity,
                                    null=True,
                                    default=None,
                                    on_delete=models.RESTRICT,
                                    verbose_name="Связанное физическое лицо",
                                    related_name='accounts')
+    position = models.ForeignKey('Position',
+                                 on_delete=models.RESTRICT,
+                                 null=True,
+                                 default=None,
+                                 verbose_name="Должность")
+    status = models.ForeignKey(AccountStatus,
+                               on_delete=models.RESTRICT,
+                               null=False,
+                               default=None,
+                               verbose_name="Статус")
+    role = models.ForeignKey(AccountRole,
+                             on_delete=models.RESTRICT,
+                             null=False,
+                             default=None,
+                             verbose_name="Роль")
+    branchOffices = models.ManyToManyField('BranchOffice',
+                                           through='AccountOfBranchEmployees',
+                                           related_name='employees_accounts',
+                                           verbose_name='Филиалы')
     email = models.CharField(max_length=40,
                              null=True,
                              default="",
@@ -50,15 +101,12 @@ class Account(AbstractUser):
                              null=True,
                              default="",
                              verbose_name="Телефон")
-    position = models.ForeignKey('Position',
-                                 on_delete=models.RESTRICT,
-                                 null=True,
-                                 default=None,
-                                 verbose_name="Должность")
+
     note = models.TextField(blank=True,
                             null=True,
                             default=None,
                             verbose_name="Примечания")
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='account_groups',
@@ -79,3 +127,4 @@ class Account(AbstractUser):
         db_table = 'Account'
         verbose_name = "Учётная запись"
         verbose_name_plural = "Учётные записи"
+

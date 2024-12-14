@@ -9,7 +9,14 @@ from .companies_models import (CompanyGroup,
                                BranchOfficeSchedule)
 # from hard_soft_ware_models import *
 from .user_models import (IndividualEntity,
-                          Account)
+                          Account,
+                          AccountRole,
+                          AccountStatus)
+from .hard_soft_ware_models import (DeviceType,
+                                    DevicePlacementMethod,
+                                    Device,
+                                    SoftwareType,
+                                    Software)
 __all__ = [
     'CompanyGroup',
     'Company',

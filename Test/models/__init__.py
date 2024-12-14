@@ -1,4 +1,3 @@
-#from application_models import *
 from .companies_models import (CompanyGroup,
                                CompanyGroupDecisionMaker,
                                Company,
@@ -10,7 +9,6 @@ from .companies_models import (CompanyGroup,
                                BranchOfficeLocation,
                                BranchOfficeSchedule,
                                AccountOfBranchEmployees)
-# from hard_soft_ware_models import *
 from .user_models import (IndividualEntity,
                           Account,
                           AccountRole,
@@ -21,6 +19,16 @@ from .hard_soft_ware_models import (DeviceType,
                                     SoftwareType,
                                     Software,
                                     MaintenanceAction)
+from .application_models import (Application,
+                                ApplicationType,
+                                ApplicationStatus,
+                                ApplicationSLA,
+                                ApplicationFiles,
+                                ApplicationActions,
+                                ApplicationSubject,
+                                ApplicationMessages,
+                                ApplicationPriority,
+                                ApplicationStatusHistory)
 __all__ = [
     'CompanyGroup',
     'CompanyGroupDecisionMaker',
@@ -45,4 +53,14 @@ __all__ = [
     'DeviceType',
     'DevicePlacementMethod',
     'Device',
+    'Application',
+    'ApplicationType',
+    'ApplicationStatus',
+    'ApplicationSLA',
+    'ApplicationFiles',
+    'ApplicationActions',
+    'ApplicationSubject',
+    'ApplicationMessages',
+    'ApplicationPriority',
+    'ApplicationStatusHistory',
 ]

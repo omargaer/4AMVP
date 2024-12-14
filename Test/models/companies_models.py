@@ -23,7 +23,6 @@ class CompanyGroup(models.Model):
         verbose_name = "Группа компаний"
         verbose_name_plural = "Группы компаний"
 
-
 class CompanyGroupDecisionMaker(models.Model):
     companyGroup = models.ForeignKey(CompanyGroup,
                                      on_delete=models.RESTRICT,
@@ -36,7 +35,6 @@ class CompanyGroupDecisionMaker(models.Model):
         verbose_name = "M2M Группа компаний - ЛПР"
         verbose_name_plural = "M2M Группа компаний - ЛПР"
         # TODO: добавить ограничение уникальности
-
 
 class Company(models.Model):
     companyGroup = models.ForeignKey(CompanyGroup,
@@ -81,7 +79,6 @@ class CompanyDecisionMaker(models.Model):
         verbose_name = "M2M Компания - ЛПР"
         verbose_name_plural = "M2M Компания - ЛПР"
         # TODO: добавить ограничение уникальности
-
 
 class Position(models.Model):
     company = models.ForeignKey(Company,

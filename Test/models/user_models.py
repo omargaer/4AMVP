@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-# циклический импорт
-# from .companies_models import Position, BranchOffice, AccountOfBranchEmployees
 
 class IndividualEntity(models.Model):
     full_name = models.CharField(max_length=50,

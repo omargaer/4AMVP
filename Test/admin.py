@@ -9,6 +9,7 @@ from .models.companies_models import (
     BranchOfficeLocation,
     BranchOfficeSchedule
 )
+
 # TODO: регистрировать через декоратор @admin.register()
 admin.site.register(CompanyGroup)
 admin.site.register(Company)

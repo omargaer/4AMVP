@@ -92,11 +92,22 @@ class CompanyDecisionMakerAdmin(admin.ModelAdmin):
 
 @admin.register(AccountOfBranchEmployees)
 class AccountOfBranchEmployeesAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'branch', 'account_status')
-    search_fields = ('employee__full_name', 'branch__name')
-    list_filter = ('branch', 'account_status')
-    fields = ('employee', 'branch', 'account_status', 'created_at', 'updated_at')
+    list_display = ('get_employee', 'get_branch', 'get_account_status')
+    search_fields = ('account__individual_entity__full_name', 'branchOffice__name')
+    list_filter = ('branchOffice', 'account__status')
+    fields = ('account', 'branchOffice', 'account__status', 'created_at', 'updated_at')
 
+    def get_employee(self, obj):
+        return obj.account.individual_entity.full_name
+    get_employee.short_description = 'Сотрудник'
+
+    def get_branch(self, obj):
+        return obj.branchOffice.name
+    get_branch.short_description = 'Филиал'
+
+    def get_account_status(self, obj):
+        return obj.account.status.name
+    get_account_status.short_description = 'Статус учётной записи'
 
 @admin.register(Position)
 class PositionAdmin(admin.ModelAdmin):
@@ -172,6 +183,13 @@ class AccountRoleAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     fields = ('name',)
 
+class AccountOfBranchEmployeesInline(admin.TabularInline):
+    model = AccountOfBranchEmployees
+    extra = 1
+    autocomplete_fields = ['branchOffice']
+    verbose_name = 'Филиал сотрудника'
+    verbose_name_plural = 'Филиалы сотрудников'
+
 
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
@@ -188,11 +206,8 @@ class AccountAdmin(UserAdmin):
                 'position',
                 'status',
                 'role',
-                'branchOffices',
                 'phone',
                 'note',
-                'groups',
-                'user_permissions',
             ),
         }),
     )
@@ -204,29 +219,12 @@ class AccountAdmin(UserAdmin):
                 'position',
                 'status',
                 'role',
-                'branchOffices',
                 'phone',
                 'note',
-                'groups',
-                'user_permissions',
             ),
         }),
     )
-
-@admin.register(IndividualEntity)
-class IndividualEntityAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'INIPA', 'ITN', 'gender')
-    search_fields = ('full_name', 'INIPA', 'ITN')
-    list_filter = ('gender',)
-    fields = ('full_name', 'INIPA', 'ITN', 'gender')
-
-
-@admin.register(BranchOfficeLocation)
-class BranchOfficeLocationAdmin(admin.ModelAdmin):
-    list_display = ('branchOffice', 'street', 'building', 'floor', 'room')
-    search_fields = ('branchOffice__name', 'street', 'building', 'room')
-    list_filter = ('branchOffice', 'street', 'building')
-    fields = ('branchOffice', 'street', 'building', 'floor', 'room')
+    inlines = [AccountOfBranchEmployeesInline]
 
 
 @admin.register(DeviceType)
@@ -365,74 +363,27 @@ class MaintenanceActionAdmin(admin.ModelAdmin):
         'hardware__modelName',
         'contractor__full_name'
     )
-    list_filter = ('action_type', 'action_date', 'contractor')
+    list_filter = ('action_type', 'contractor')
+    readonly_fields = ('action_date',)  # Make action_date read-only
     fields = (
         'device',
         'hardware',
         'action_type',
         'description',
-        'action_date',
-        'contractor'
+        'contractor',
+        'action_date',  # Optional: Include in fields to display it
     )
-@admin.register(IndividualEntity)
-class IndividualEntityAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'INIPA', 'ITN', 'gender')
-    search_fields = ('full_name', 'INIPA', 'ITN')
-    list_filter = ('gender',)
 
-@admin.register(Account)
-class AccountAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'phone', 'position', 'status', 'role')
-    search_fields = ('username', 'email', 'phone')
-    list_filter = ('status', 'role', 'position')
-    filter_horizontal = ('groups', 'user_permissions', 'branchOffices')
-
-@admin.register(Position)
-class PositionAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-
-@admin.register(AccountStatus)
-class AccountStatusAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-
-@admin.register(AccountRole)
-class AccountRoleAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-
-@admin.register(BranchOffice)
-class BranchOfficeAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-
-@admin.register(BranchOfficeLocation)
-class BranchOfficeLocationAdmin(admin.ModelAdmin):
-    list_display = ('branchOffice', 'street', 'building', 'floor', 'room')
-    search_fields = ('branchOffice__name', 'street', 'building', 'room')
-    list_filter = ('branchOffice', 'floor')
-
-@admin.register(Device)
-class DeviceAdmin(admin.ModelAdmin):
-    list_display = ('type', 'inventoryNumber', 'factoryNumber', 'responsiblePerson', 'branchOfficeLocation', 'placement')
-    search_fields = ('type__name', 'inventoryNumber', 'factoryNumber')
-    list_filter = ('type', 'placement', 'branchOfficeLocation')
-
-@admin.register(DeviceType)
-class DeviceTypeAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-
-@admin.register(DevicePlacementMethod)
-class DevicePlacementMethodAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
 
 @admin.register(ApplicationType)
 class ApplicationTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
+
+class ApplicationSubjectInline(admin.TabularInline):
+    model = ApplicationSubject
+    extra = 1
+    autocomplete_fields = ['device']
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
@@ -445,7 +396,11 @@ class ApplicationAdmin(admin.ModelAdmin):
     )
     search_fields = ('shortDescription', 'content')
     list_filter = ('applicationType', 'address', 'applicant', 'contractor')
-    filter_horizontal = ('device',)
+    # Удаляем filter_horizontal
+    # filter_horizontal = ('device',)
+
+    inlines = [ApplicationSubjectInline]
+
 
 @admin.register(ApplicationSubject)
 class ApplicationSubjectAdmin(admin.ModelAdmin):

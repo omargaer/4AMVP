@@ -79,12 +79,14 @@ class Account(AbstractUser):
                                  verbose_name="Должность")
     status = models.ForeignKey(AccountStatus,
                                on_delete=models.RESTRICT,
-                               null=False,
+                               # TODO: потом изменить
+                               null=True,
                                default=None,
                                verbose_name="Статус")
     role = models.ForeignKey(AccountRole,
                              on_delete=models.RESTRICT,
-                             null=False,
+                             # TODO: потом изменить
+                             null=True,
                              default=None,
                              verbose_name="Роль")
     branchOffices = models.ManyToManyField('BranchOffice',

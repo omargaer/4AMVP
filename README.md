@@ -9,7 +9,7 @@ python -m venv .venv
 ```
 ### Активация виртуального окружения
 ```bash
-..venv\Scripts\activate
+.venv\Scripts\activate
 ```
 ### Установка зависимостей
 ```bash

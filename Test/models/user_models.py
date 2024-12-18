@@ -13,7 +13,7 @@ class IndividualEntity(models.Model):
                              null=True,
                              default='')
     # ИНН
-    ITN = models.CharField(max_length=10,
+    ITN = models.CharField(max_length=12,
                            null=True,
                            default='',
                            verbose_name="ИНН")

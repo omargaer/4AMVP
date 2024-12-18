@@ -76,38 +76,42 @@ class CompanyAdmin(admin.ModelAdmin):
     ordering = ('name',)
     fields = ('companyGroup', 'name', 'ITN', 'note')
 
-@admin.register(CompanyGroupDecisionMaker)
-class CompanyGroupDecisionMakerAdmin(admin.ModelAdmin):
-    list_display = ('companyGroup', 'decisionMaker')
-    search_fields = ('companyGroup__name', 'decisionMaker__full_name')
-    list_filter = ('companyGroup', 'decisionMaker')
-    fields = ('companyGroup', 'decisionMaker')
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'companyGroup':
+            return db_field.formfield(required=False, **kwargs)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-@admin.register(CompanyDecisionMaker)
-class CompanyDecisionMakerAdmin(admin.ModelAdmin):
-    list_display = ('company', 'decisionMaker')
-    search_fields = ('company__name', 'decisionMaker__full_name')
-    list_filter = ('company', 'decisionMaker')
-    fields = ('company', 'decisionMaker')
-
-@admin.register(AccountOfBranchEmployees)
-class AccountOfBranchEmployeesAdmin(admin.ModelAdmin):
-    list_display = ('get_employee', 'get_branch', 'get_account_status')
-    search_fields = ('account__individual_entity__full_name', 'branchOffice__name')
-    list_filter = ('branchOffice', 'account__status')
-    fields = ('account', 'branchOffice', 'account__status', 'created_at', 'updated_at')
-
-    def get_employee(self, obj):
-        return obj.account.individual_entity.full_name
-    get_employee.short_description = 'Сотрудник'
-
-    def get_branch(self, obj):
-        return obj.branchOffice.name
-    get_branch.short_description = 'Филиал'
-
-    def get_account_status(self, obj):
-        return obj.account.status.name
-    get_account_status.short_description = 'Статус учётной записи'
+# не нужно регистрировать m2m таблицы (возможно)
+# @admin.register(CompanyGroupDecisionMaker)
+# class CompanyGroupDecisionMakerAdmin(admin.ModelAdmin):
+#     list_display = ('companyGroup', 'decisionMaker')
+#     search_fields = ('companyGroup__name', 'decisionMaker__full_name')
+#     list_filter = ('companyGroup', 'decisionMaker')
+#     fields = ('companyGroup', 'decisionMaker')
+# @admin.register(CompanyDecisionMaker)
+# class CompanyDecisionMakerAdmin(admin.ModelAdmin):
+#     list_display = ('company', 'decisionMaker')
+#     search_fields = ('company__name', 'decisionMaker__full_name')
+#     list_filter = ('company', 'decisionMaker')
+#     fields = ('company', 'decisionMaker')
+# @admin.register(AccountOfBranchEmployees)
+# class AccountOfBranchEmployeesAdmin(admin.ModelAdmin):
+#     list_display = ('get_employee', 'get_branch', 'get_account_status')
+#     search_fields = ('account__individual_entity__full_name', 'branchOffice__name')
+#     list_filter = ('branchOffice', 'account__status')
+#     fields = ('account', 'branchOffice', 'account__status', 'created_at', 'updated_at')
+#
+#     def get_employee(self, obj):
+#         return obj.account.individual_entity.full_name
+#     get_employee.short_description = 'Сотрудник'
+#
+#     def get_branch(self, obj):
+#         return obj.branchOffice.name
+#     get_branch.short_description = 'Филиал'
+#
+#     def get_account_status(self, obj):
+#         return obj.account.status.name
+#     get_account_status.short_description = 'Статус учётной записи'
 
 @admin.register(Position)
 class PositionAdmin(admin.ModelAdmin):

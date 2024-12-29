@@ -7,9 +7,9 @@ from django.db import models as models
 class CompanyGroup(models.Model):
     name = models.CharField(max_length=100,
                             verbose_name='Название группы компаний')
-    note = models.TextField(blank=True,
+    note = models.CharField(max_length=200,
                             null=True,
-                            default=None,
+                            default='',
                             verbose_name='Примечания')
     decisionMaker = models.ManyToManyField('IndividualEntity',
                                            through='CompanyGroupDecisionMaker',
@@ -55,10 +55,10 @@ class Company(models.Model):
                            null=True,
                            default='',
                            verbose_name="ИНН")
-    note = models.TextField(blank=True,
+    note = models.CharField(max_length=200,
                             null=True,
-                            default=None,
-                            verbose_name="Примечания")
+                            default='',
+                            verbose_name='Примечания')
     def __str__(self):
         return self.name
 
@@ -91,7 +91,7 @@ class Position(models.Model):
                             null=False,
                             default='',
                             verbose_name='Название должности')
-    note = models.TextField(blank=True,
+    note = models.CharField(max_length=200,
                             null=True,
                             default='',
                             verbose_name='Примечания')
@@ -151,10 +151,19 @@ class BranchOffice(models.Model):
                              null=True,
                              default=None,
                              verbose_name="Телефон филиала")
-    note = models.TextField(blank=True,
+    note = models.CharField(max_length=200,
                             null=True,
-                            default=None,
-                            verbose_name="Примечания")
+                            default='',
+                            verbose_name='Примечания')
+    street = models.CharField(max_length=20,
+                                  null=False,
+                                  default='',
+                                  verbose_name="Улица")
+    building = models.CharField(max_length=20,
+                                null=False,
+                                default='',
+                                verbose_name="Строение\здание")
+
     def __str__(self):
         return (self.company.name + " "
                 + self.type.name + " "
@@ -172,35 +181,24 @@ class BranchOfficeLocation(models.Model):
                                      default=None,
                                      related_name='locations',
                                      verbose_name="Локация филиала")
-    # TODO: потом как-нибудь
-    # location = gis_models.PointField(geography=True,
-    #                                  null=True,
-    #                                  default=None,
-    #                                  blank=True,
-    #                                  verbose_name="Местоположение")
-    street = models.CharField(max_length=20,
-                                  null=False,
-                                  default='',
-                                  verbose_name="Улица")
-    building = models.CharField(max_length=20,
-                                null=False,
-                                default='',
-                                verbose_name="Строение\здание")
     floor = models.IntegerField(null=True,
                                 verbose_name="Этаж",
                                 default=0)
     room = models.CharField(max_length=5,
                             null=False,
                             default='',
-                            verbose_name="Помещение")
+                            verbose_name="Номер помещения")
+    room_name = models.CharField(max_length=30,
+                                 null=True,
+                                 default='',
+                                 verbose_name="Название помещения")
     def __str__(self):
-        return (self.branchOffice.__str__() + " "
-                + self.street)
+        return self.room_name.__str__() + ", этаж: " + self.floor.__str__() + ", помещение " + self.room.__str__()
 
     class Meta:
         db_table = 'BranchOfficeLocation'
-        verbose_name = "Адрес филиала"
-        verbose_name_plural = "Адреса филиала"
+        verbose_name = "Помещение филиала"
+        verbose_name_plural = "Помещения филиала"
 
 class BranchOfficeSchedule(models.Model):
     DAYS_OF_WEEK = [

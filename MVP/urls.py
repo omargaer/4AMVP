@@ -17,6 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from Test.admin_views import load_branch_offices, load_locations, get_applicants
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-]
+    path('admin/load-branch-offices/', load_branch_offices, name='load_branch_offices'),
+    path('admin/load-locations/', load_locations, name='load_locations'),
+    path('admin/get_applicants/', get_applicants, name='get_applicants'),
+    path('admin/', admin.site.urls)
+    ]

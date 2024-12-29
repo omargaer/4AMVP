@@ -28,12 +28,18 @@ class Application(models.Model):
                                         null=False,
                                         default=None,
                                         verbose_name="Тип заявки")
-    address = models.ForeignKey('BranchOfficeLocation',
-                                on_delete=models.RESTRICT,
-                                null=False,
-                                default=None,
-                                related_name='applications',
-                                verbose_name='Адрес')
+    company = models.ForeignKey('Company',
+                                on_delete=models.CASCADE,
+                                verbose_name="Компания",
+                                null=False)
+    branch_office = models.ForeignKey('BranchOffice',
+                                      on_delete=models.CASCADE,
+                                      verbose_name="Филиал",
+                                      null=False)
+    location = models.ForeignKey('BranchOfficeLocation',
+                                 on_delete=models.CASCADE,
+                                 verbose_name="Помещение",
+                                 null=False)
     applicant = models.ForeignKey('IndividualEntity',
                                   on_delete=models.RESTRICT,
                                   null=False,
@@ -51,8 +57,17 @@ class Application(models.Model):
                                     related_name='applications',
                                     verbose_name='Оборудование по заявке')
     def __str__(self):
-        # TODO: переделать после
-        return self.address.__str__() + " " + self.shortDescription
+        return self.location.__str__() + " " + self.shortDescription
+
+    def save(self, *args, **kwargs):
+        # Определяем, является ли объект новым
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            ApplicationActions.objects.create(
+                application=self,
+                content="Заявка создана"
+            )
 
     class Meta:
         db_table = 'Application'
@@ -151,9 +166,10 @@ class ApplicationActions(models.Model):
                                     default=None,
                                     verbose_name='Заявка')
     timestamp = models.DateTimeField(null=False,
-                                     default=None,
-                                     verbose_name='Дата и время действия')
-    content = models.TextField(null=False,
+                                     verbose_name='Дата и время действия',
+                                     auto_now_add=True)
+    content = models.CharField(max_length=300,
+                               null=False,
                                blank=False,
                                default='',
                                verbose_name='Описание действия')

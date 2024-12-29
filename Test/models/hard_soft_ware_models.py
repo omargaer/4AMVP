@@ -50,10 +50,12 @@ class Device(models.Model):
     inventoryNumber = models.CharField(max_length=20,
                                        null=True,
                                        default=None,
+                                       blank=True,
                                        verbose_name="Инвентарный номер")
     factoryNumber = models.CharField(max_length=20,
                                      null=True,
                                      default=None,
+                                     blank=True,
                                      verbose_name="Заводской номер")
     def __str__(self):
         return self.type.name + " " + self.inventoryNumber
@@ -99,6 +101,7 @@ class Software(models.Model):
     license_key = models.CharField(max_length=200,
                                    null=True,
                                    default=None,
+                                   blank=True,
                                    verbose_name='Лицензионный ключ')
     purchaseDate = models.DateField(null=True,
                                     default=None,
@@ -152,10 +155,12 @@ class Hardware(models.Model):
     inventoryNumber = models.CharField(max_length=20,
                                        null=True,
                                        default=None,
+                                       blank=True,
                                        verbose_name="Инвентарный номер")
     factoryNumber = models.CharField(max_length=20,
                                      null=True,
                                      default=None,
+                                     blank=True,
                                      verbose_name="Заводской номер")
     purchaseDate = models.DateField(null=True,
                                     default=None,

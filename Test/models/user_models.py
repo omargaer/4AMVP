@@ -26,8 +26,7 @@ class IndividualEntity(models.Model):
                                  default=2)
 
     def __str__(self):
-        return (self.full_name + " " +
-                self.INIPA)
+        return (self.full_name)
 
     class Meta:
         db_table = 'IndividualEntity'

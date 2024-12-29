@@ -1,5 +1,13 @@
+from django import forms
+from django.core.exceptions import ValidationError
+from django.urls import path
 from django.contrib import admin
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.admin import UserAdmin
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from django import forms
+from .models.hard_soft_ware_models import Device
 
 from .models.companies_models import (
     CompanyGroup,
@@ -68,6 +76,15 @@ class CompanyGroupAdmin(admin.ModelAdmin):
 
     get_related_companies.short_description = 'Связанные компании'
 
+class BranchOfficeInline(admin.TabularInline):
+    """
+    Inline-класс для отображения и редактирования филиалов компании в интерфейсе админки.
+    """
+    model = BranchOffice
+    extra = 1  # Количество дополнительных пустых форм для добавления
+    fields = ('type', 'status', 'phone', 'note', 'street', 'building')
+    show_change_link = True  # Добавляет ссылку на редактирование филиала отдельно
+
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ('companyGroup', 'name', 'ITN', 'note')
@@ -75,7 +92,7 @@ class CompanyAdmin(admin.ModelAdmin):
     list_filter = ('companyGroup',)
     ordering = ('name',)
     fields = ('companyGroup', 'name', 'ITN', 'note')
-
+    inlines = [BranchOfficeInline]
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'companyGroup':
             return db_field.formfield(required=False, **kwargs)
@@ -121,7 +138,6 @@ class PositionAdmin(admin.ModelAdmin):
     ordering = ('name',)
     fields = ('company', 'name', 'note')
 
-
 @admin.register(BranchOfficeType)
 class BranchOfficeTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -129,7 +145,6 @@ class BranchOfficeTypeAdmin(admin.ModelAdmin):
     list_filter = ('name',)
     ordering = ('name',)
     fields = ('name',)
-
 
 @admin.register(BranchOfficeStatus)
 class BranchOfficeStatusAdmin(admin.ModelAdmin):
@@ -139,24 +154,27 @@ class BranchOfficeStatusAdmin(admin.ModelAdmin):
     ordering = ('name',)
     fields = ('name',)
 
+class BranchOfficeLocationInline(admin.TabularInline):
+    model = BranchOfficeLocation
+    extra = 1
+    fields = ('floor', 'room', 'room_name')
 
 @admin.register(BranchOffice)
 class BranchOfficeAdmin(admin.ModelAdmin):
-    list_display = ('company', 'type', 'status', 'phone', 'note')
+    list_display = ('company', 'type', 'status', 'phone', 'note', 'street', 'building')
     search_fields = ('company__name', 'type__name', 'status__name', 'phone')
     list_filter = ('company', 'type', 'status')
     ordering = ('company__name', 'type__name')
-    fields = ('company', 'type', 'status', 'phone', 'note')
-
+    fields = ('company', 'type', 'status', 'phone', 'note', 'street', 'building')
+    inlines = [BranchOfficeLocationInline]
 
 @admin.register(BranchOfficeLocation)
 class BranchOfficeLocationAdmin(admin.ModelAdmin):
-    list_display = ('branchOffice', 'street', 'building', 'floor', 'room')
-    search_fields = ('branchOffice__company__name', 'street', 'building', 'room')
-    list_filter = ('branchOffice', 'street')
-    ordering = ('branchOffice__company__name', 'street')
-    fields = ('branchOffice', 'street', 'building', 'floor', 'room')
-
+    list_display = ('branchOffice',  'floor', 'room', 'room_name')
+    search_fields = ('branchOffice__company__name', 'room', 'floor', 'room_name')
+    list_filter = ['branchOffice']
+    ordering = ['branchOffice__company__name']
+    fields = ('branchOffice', 'floor', 'room', 'room_name')
 
 @admin.register(BranchOfficeSchedule)
 class BranchOfficeScheduleAdmin(admin.ModelAdmin):
@@ -165,7 +183,6 @@ class BranchOfficeScheduleAdmin(admin.ModelAdmin):
     ordering = ('branchOffice', 'day_of_week')
     fields = ('branchOffice', 'day_of_week', 'opening_time', 'closing_time')
 
-
 @admin.register(IndividualEntity)
 class IndividualEntityAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'INIPA', 'ITN', 'gender')
@@ -173,13 +190,11 @@ class IndividualEntityAdmin(admin.ModelAdmin):
     list_filter = ('gender',)
     fields = ('full_name', 'INIPA', 'ITN', 'gender')
 
-
 @admin.register(AccountStatus)
 class AccountStatusAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
     fields = ('name',)
-
 
 @admin.register(AccountRole)
 class AccountRoleAdmin(admin.ModelAdmin):
@@ -193,7 +208,6 @@ class AccountOfBranchEmployeesInline(admin.TabularInline):
     autocomplete_fields = ['branchOffice']
     verbose_name = 'Филиал сотрудника'
     verbose_name_plural = 'Филиалы сотрудников'
-
 
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
@@ -230,20 +244,17 @@ class AccountAdmin(UserAdmin):
     )
     inlines = [AccountOfBranchEmployeesInline]
 
-
 @admin.register(DeviceType)
 class DeviceTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
     fields = ('name',)
 
-
 @admin.register(DevicePlacementMethod)
 class DevicePlacementMethodAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
     fields = ('name',)
-
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
@@ -272,13 +283,11 @@ class DeviceAdmin(admin.ModelAdmin):
         'placement'
     )
 
-
 @admin.register(SoftwareType)
 class SoftwareTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
     fields = ('name',)
-
 
 @admin.register(Software)
 class SoftwareAdmin(admin.ModelAdmin):
@@ -310,13 +319,11 @@ class SoftwareAdmin(admin.ModelAdmin):
         'licenseExpirationDate'
     )
 
-
 @admin.register(HardwareType)
 class HardwareTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
     fields = ('name',)
-
 
 @admin.register(Hardware)
 class HardwareAdmin(admin.ModelAdmin):
@@ -351,7 +358,6 @@ class HardwareAdmin(admin.ModelAdmin):
         'warrantyExpirationDate'
     )
 
-
 @admin.register(MaintenanceAction)
 class MaintenanceActionAdmin(admin.ModelAdmin):
     list_display = (
@@ -378,33 +384,73 @@ class MaintenanceActionAdmin(admin.ModelAdmin):
         'action_date',  # Optional: Include in fields to display it
     )
 
-
 @admin.register(ApplicationType)
 class ApplicationTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
+class ApplicationForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = '__all__'
 
-class ApplicationSubjectInline(admin.TabularInline):
-    model = ApplicationSubject
+    def __init__(self, *args, **kwargs):
+        super(ApplicationForm, self).__init__(*args, **kwargs)
+        branch_office = self.initial.get('branch_office') or self.data.get('branch_office')
+        if branch_office:
+            try:
+                branch_office_instance = BranchOffice.objects.get(pk=branch_office)
+                self.fields['applicant'].queryset = IndividualEntity.objects.filter(
+                    accounts__branchOffices=branch_office_instance
+                ).distinct()
+            except BranchOffice.DoesNotExist:
+                self.fields['applicant'].queryset = IndividualEntity.objects.none()
+        else:
+            self.fields['applicant'].queryset = IndividualEntity.objects.none()
+        self.fields['applicant'].required = True if branch_office else False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        branch_office = cleaned_data.get('branch_office')
+        applicant = cleaned_data.get('applicant')
+
+        if branch_office and not applicant:
+            raise ValidationError('Заявитель обязателен при выборе филиала.')
+
+        if applicant and branch_office:
+            if not IndividualEntity.objects.filter(
+                id=applicant.id,
+                accounts__branchOffices=branch_office
+            ).exists():
+                raise ValidationError('Заявитель должен принадлежать выбранному филиалу.')
+
+        if not branch_office and applicant:
+            raise ValidationError('Невозможно выбрать заявителя без выбора филиала.')
+
+class ApplicationActionsInline(admin.TabularInline):
+    model = ApplicationActions
     extra = 1
-    autocomplete_fields = ['device']
+    fields = ('timestamp', 'content')
+    readonly_fields = ('timestamp',)
+    can_delete = False
+    show_change_link = False
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
+    form = ApplicationForm
     list_display = (
         'shortDescription',
         'applicationType',
-        'address',
+        'company',
+        'branch_office',
+        'location',
         'applicant',
         'contractor',
     )
     search_fields = ('shortDescription', 'content')
-    list_filter = ('applicationType', 'address', 'applicant', 'contractor')
-    # Удаляем filter_horizontal
-    # filter_horizontal = ('device',)
-
-    inlines = [ApplicationSubjectInline]
-
+    list_filter = ('applicationType', 'company', 'branch_office', 'location', 'applicant', 'contractor')
+    inlines = [ApplicationActionsInline]
+    class Media:
+        js = ('admin/js/application_admin.js',)
 
 @admin.register(ApplicationSubject)
 class ApplicationSubjectAdmin(admin.ModelAdmin):

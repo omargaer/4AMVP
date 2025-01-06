@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div>
+        <button type="button" id="btn-companies">Группы компаний</button>
+        <button type="button" id="btn-apps">Заявки</button>
+        <button type="button" id="btn-users">Люди</button>
+        <button type="button" id="btn-wares">Техника</button>
+    </div>
+    <div id="menu-container">
+        <!-- Здесь будет подгружаться выбранное меню -->
+    </div>
+{% endblock content %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('button');
+        const menuContainer = document.getElementById('menu-container');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const menuType = this.id.split('btn-')[1];
+                loadMenu(menuType);
+            });
+        });
+
+        function loadMenu(menuType) {
+            // Очистить текущий контейнер меню
+            menuContainer.innerHTML = '';
+
+            // Создать AJAX-запрос для загрузки соответствующего шаблона
+            fetch(`{% url 'test:load_menu' %}?type=${menuType}`)
+                .then(response => response.text())
+                .then(html => {
+                    menuContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    alert(error);
+                });
+        }
+    });
+</script>
+{% endblock js %}

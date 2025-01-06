@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <ul>
+        {% for user in users %}
+            <li>{{ user.full_name }}</li>
+        {% empty %}
+            <li>Нет пользователей для отображения.</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

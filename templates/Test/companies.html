@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <ul>
+        {% for company in companies %}
+            <li>{{ company.name }}</li>
+        {% empty %}
+            <li>Нет компаний для отображения.</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

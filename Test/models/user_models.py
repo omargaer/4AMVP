@@ -64,6 +64,8 @@ class AccountRole(models.Model):
 
 
 class Account(AbstractUser):
+    first_name = None
+    last_name = None
     # username, password наследуются от AbstractUser
     individual_entity = models.ForeignKey(IndividualEntity,
                                    null=True,
@@ -92,10 +94,10 @@ class Account(AbstractUser):
                                            through='AccountOfBranchEmployees',
                                            related_name='employees_accounts',
                                            verbose_name='Филиалы')
-    email = models.CharField(max_length=40,
-                             null=True,
-                             default="",
-                             verbose_name="Электронная почта")
+    # email = models.ChзачеarField(max_length=40,
+    #                          null=True,
+    #                          default="",
+    #                          verbose_name="Электронная почта")
     phone = models.CharField(max_length=12,
                              null=True,
                              default="",

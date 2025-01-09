@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 from Test.models import Device
 
 
@@ -52,10 +52,14 @@ class Application(models.Model):
                                    default=None,
                                    related_name='applications',
                                    verbose_name='Исполнитель')
-    device = models.ManyToManyField(Device,
+    device = models.ManyToManyField('Device',
                                     through='ApplicationSubject',
                                     related_name='applications',
                                     verbose_name='Оборудование по заявке')
+    status = models.ManyToManyField('ApplicationStatus',
+                                    through='ApplicationStatusHistory',
+                                    related_name='applications',
+                                    verbose_name='Статусы заявки')
     def __str__(self):
         return self.location.__str__() + " " + self.shortDescription
 
@@ -64,10 +68,31 @@ class Application(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new:
+            # Создаём действие "Заявка создана"
             ApplicationActions.objects.create(
                 application=self,
                 content="Заявка создана"
             )
+            try:
+                # Получаем или создаём статус 'Новая'
+                new_status, created = ApplicationStatus.objects.get_or_create(name='Новая')
+                # Создаём запись в истории статусов
+                ApplicationStatusHistory.objects.create(
+                    application=self,
+                    newApplicationStatus=new_status,
+                    changeTime=timezone.now()
+                )
+                # Получаем или создаём приоритет 'Средний'
+                medium_priority, created = ApplicationPriority.objects.get_or_create(name='Средний')
+                # Создаём SLA с приоритетом 'Средний' и текущей датой создания
+                ApplicationSLA.objects.create(
+                    application=self,  # Связываем с текущей заявкой
+                    priority=medium_priority,  # Устанавливаем приоритет 'Средний'
+                    creationDate=timezone.now().date()  # Устанавливаем текущую дату создания
+                )
+            except Exception as e:
+                # Обработка ошибок (например, логирование)
+                pass  # Можно заменить на логирование ошибки
 
     class Meta:
         db_table = 'Application'
@@ -116,16 +141,19 @@ class ApplicationSLA(models.Model):
                                  null=False,
                                  default=None,
                                  verbose_name='Приоритет')
-    creationDate = models.DateField(null=False,
+    creationDate = models.DateField(null=True,
                                     verbose_name='Дата создания')
-    acceptanceDate = models.DateField(null=False,
+    acceptanceDate = models.DateField(null=True,
                                       verbose_name='Дата принятия')
-    completionDate = models.DateField(null=False,
+    completionDate = models.DateField(null=True,
                                       verbose_name='Дата закрытия')
     class Meta:
         db_table = 'ApplicationSLA'
         verbose_name = 'SLA заявки'
         verbose_name_plural = 'SLA заявки'
+
+    def __str__(self):
+        return f"SLA для заявки {self.application.shortDescription}"
 
 class ApplicationStatus(models.Model):
     name = models.CharField(max_length=20,
@@ -139,22 +167,18 @@ class ApplicationStatus(models.Model):
         verbose_name_plural = 'Статусы заявки'
 
 class ApplicationStatusHistory(models.Model):
-    application = models.ForeignKey(Application,
+    application = models.ForeignKey('Application',
                                     on_delete=models.RESTRICT,
                                     null=False,
                                     default=None,
                                     verbose_name='Заявка')
-    changeTime = models.DateTimeField(null=False,
-                                      default=None,
+    changeTime = models.DateTimeField(auto_now_add=True,
                                       verbose_name='Дата и время изменения')
     newApplicationStatus = models.ForeignKey(ApplicationStatus,
                                              on_delete=models.RESTRICT,
                                              default=None,
                                              verbose_name='Новый статус')
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['application'], name='unique_application_status_history')
-        ]
         db_table = 'ApplicationStatusHistory'
         verbose_name = 'История изменения статусов заявки'
         verbose_name_plural = 'Истории изменения статусов заявок'

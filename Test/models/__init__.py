@@ -62,5 +62,5 @@ __all__ = [
     'ApplicationSubject',
     'ApplicationMessages',
     'ApplicationPriority',
-    'ApplicationStatusHistory',
+    'ApplicationStatusHistory'
 ]

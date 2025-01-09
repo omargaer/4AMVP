@@ -4,8 +4,6 @@ from django.contrib.auth.models import AbstractUser
 class IndividualEntity(models.Model):
     full_name = models.CharField(max_length=50,
                                  verbose_name='ФИО')
-    # TODO: потом как-нибудь
-    # photo = models.ImageField(verbose_name='Аватарка')
 
     # СНИЛС
     INIPA = models.CharField(max_length=11,

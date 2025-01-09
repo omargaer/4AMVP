@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/load-branch-offices/', load_branch_offices, name='load_branch_offices'),
     path('admin/load-locations/', load_locations, name='load_locations'),
     path('admin/get_applicants/', get_applicants, name='get_applicants'),
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
+    path('', admin.site.urls)
     ]

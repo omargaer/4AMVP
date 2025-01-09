@@ -58,7 +58,7 @@ class Device(models.Model):
                                      blank=True,
                                      verbose_name="Заводской номер")
     def __str__(self):
-        return self.type.name + " " + self.inventoryNumber
+        return self.type.name + " " + str(self.inventoryNumber)
 
     class Meta:
         db_table = 'Device'

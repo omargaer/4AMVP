@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from Test.models import AccountOfBranchEmployees
+from Test.models import BranchOfficeEmployees
 from Test.models.user_models import (
     IndividualEntity,
     AccountStatus,
@@ -28,12 +28,12 @@ class AccountRoleAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     fields = ('name',)
 
-class AccountOfBranchEmployeesInline(admin.TabularInline):
-    model = AccountOfBranchEmployees
-    extra = 1
-    autocomplete_fields = ['branchOffice']
-    verbose_name = 'Филиал сотрудника'
-    verbose_name_plural = 'Филиалы сотрудников'
+# class BranchOfficeEmployeesInline(admin.TabularInline):
+#     model = BranchOfficeEmployees
+#     extra = 1
+#     autocomplete_fields = ['branchOffice']
+#     verbose_name = 'Филиал сотрудника'
+#     verbose_name_plural = 'Филиалы сотрудников'
 
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
@@ -84,4 +84,4 @@ class AccountAdmin(UserAdmin):
             ),
         }),
     )
-    inlines = [AccountOfBranchEmployeesInline]
+    #inlines = [BranchOfficeEmployeesInline]

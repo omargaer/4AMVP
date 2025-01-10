@@ -8,7 +8,7 @@ from .companies_models import (CompanyGroup,
                                BranchOfficeType,
                                BranchOfficeLocation,
                                BranchOfficeSchedule,
-                               AccountOfBranchEmployees)
+                               BranchOfficeEmployees)
 from .user_models import (IndividualEntity,
                           Account,
                           AccountRole,
@@ -41,7 +41,7 @@ __all__ = [
     'BranchOffice',
     'BranchOfficeLocation',
     'BranchOfficeSchedule',
-    'AccountOfBranchEmployees',
+    'BranchOfficeEmployees',
     'Account',
     'IndividualEntity',
     'Account',

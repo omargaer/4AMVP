@@ -22,9 +22,13 @@ class IndividualEntity(models.Model):
                                  verbose_name="Пол",
                                  null=False,
                                  default=2)
+    workplaces = models.ManyToManyField('BranchOffice',
+                                        through='BranchOfficeEmployees',
+                                        related_name='individual_entities',
+                                        verbose_name='Филиалы')
 
     def __str__(self):
-        return (self.full_name)
+        return self.full_name
 
     class Meta:
         db_table = 'IndividualEntity'
@@ -88,14 +92,6 @@ class Account(AbstractUser):
                              null=True,
                              default=None,
                              verbose_name="Роль")
-    branchOffices = models.ManyToManyField('BranchOffice',
-                                           through='AccountOfBranchEmployees',
-                                           related_name='employees_accounts',
-                                           verbose_name='Филиалы')
-    # email = models.ChзачеarField(max_length=40,
-    #                          null=True,
-    #                          default="",
-    #                          verbose_name="Электронная почта")
     phone = models.CharField(max_length=12,
                              null=True,
                              default="",

@@ -9,10 +9,12 @@ class CompanyGroup(models.Model):
                             verbose_name='Название группы компаний')
     note = models.CharField(max_length=200,
                             null=True,
+                            blank=True,
                             default='',
                             verbose_name='Примечания')
     decisionMaker = models.ManyToManyField('IndividualEntity',
                                            through='CompanyGroupDecisionMaker',
+                                           blank=True,
                                            related_name='decision_maker_in_company_groups',
                                            verbose_name='ЛПР')
     def __str__(self):
@@ -57,6 +59,7 @@ class Company(models.Model):
                            verbose_name="ИНН")
     note = models.CharField(max_length=200,
                             null=True,
+                            blank=True,
                             default='',
                             verbose_name='Примечания')
     def __str__(self):
@@ -93,6 +96,7 @@ class Position(models.Model):
                             verbose_name='Название должности')
     note = models.CharField(max_length=200,
                             null=True,
+                            blank=True,
                             default='',
                             verbose_name='Примечания')
     def __str__(self):
@@ -153,6 +157,7 @@ class BranchOffice(models.Model):
                              verbose_name="Телефон филиала")
     note = models.CharField(max_length=200,
                             null=True,
+                            blank=True,
                             default='',
                             verbose_name='Примечания')
     street = models.CharField(max_length=20,
@@ -216,11 +221,17 @@ class BranchOfficeSchedule(models.Model):
                                      verbose_name="Филиал")
     day_of_week = models.IntegerField(choices=DAYS_OF_WEEK,
                                       verbose_name="День недели")
-    opening_time = models.TimeField(verbose_name="Время открытия")
-    closing_time = models.TimeField(verbose_name="Время закрытия")
+    opening_time = models.TimeField(verbose_name="Время открытия",
+                                    null=True,
+                                    blank=True)
+    closing_time = models.TimeField(verbose_name="Время закрытия",
+                                    null=True,
+                                    blank=True)
 
     def __str__(self):
-        return f"{self.get_day_of_week_display()}: {self.opening_time} - {self.closing_time}"
+        if self.opening_time and self.closing_time:
+            return f"{self.get_day_of_week_display()}: {self.opening_time} - {self.closing_time}"
+        return f"{self.get_day_of_week_display()}: Не работает"
 
     class Meta:
         db_table = 'BranchOfficeSchedule'
@@ -228,18 +239,19 @@ class BranchOfficeSchedule(models.Model):
         verbose_name_plural = "Расписания филиалов"
         unique_together = ('branchOffice', 'day_of_week')
 
-class AccountOfBranchEmployees(models.Model):
+class BranchOfficeEmployees(models.Model):
     branchOffice = models.ForeignKey(BranchOffice,
                                      on_delete=models.RESTRICT,
                                      verbose_name='Филиал')
-    account = models.ForeignKey('Account',
+    employee = models.ForeignKey('IndividualEntity',
                                 on_delete=models.RESTRICT,
-                                verbose_name='Учётная запись')
-
+                                verbose_name='Физическое лицо')
     class Meta:
-        db_table = 'AccountOfBranchEmployees'
-        verbose_name = "M2M Учётка-Филиал"
-        verbose_name_plural = "M2M Учётка-Филиал"
-        # TODO: заменить на constraint
-        # unique_together = ('account', 'branch_office')
+        db_table = 'BranchEmployees'
+        verbose_name = "M2M Человек-Филиал"
+        verbose_name_plural = "M2M Человек-Филиал"
+        constraints = [
+            models.UniqueConstraint(fields=['employee', 'branchOffice'],
+                                    name='unique_employee_branch_office')
+        ]
 #endregion Филиал

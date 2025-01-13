@@ -179,6 +179,7 @@ class BranchOffice(models.Model):
         verbose_name = "Филиал компании"
         verbose_name_plural = "Филиалы компании"
 
+# Помещение филиала
 class BranchOfficeLocation(models.Model):
     branchOffice = models.ForeignKey(BranchOffice,
                                      on_delete=models.RESTRICT,
@@ -205,6 +206,7 @@ class BranchOfficeLocation(models.Model):
         verbose_name = "Помещение филиала"
         verbose_name_plural = "Помещения филиала"
 
+# Расписание филиала
 class BranchOfficeSchedule(models.Model):
     DAYS_OF_WEEK = [
         (0, 'Понедельник'),
@@ -239,6 +241,7 @@ class BranchOfficeSchedule(models.Model):
         verbose_name_plural = "Расписания филиалов"
         unique_together = ('branchOffice', 'day_of_week')
 
+# Работники филиала
 class BranchOfficeEmployees(models.Model):
     branchOffice = models.ForeignKey(BranchOffice,
                                      on_delete=models.RESTRICT,
@@ -246,6 +249,11 @@ class BranchOfficeEmployees(models.Model):
     employee = models.ForeignKey('IndividualEntity',
                                 on_delete=models.RESTRICT,
                                 verbose_name='Физическое лицо')
+    position = models.ForeignKey(Position,
+                                 on_delete=models.RESTRICT,
+                                 verbose_name='Должность',
+                                 default=None,
+                                 null=True)
     class Meta:
         db_table = 'BranchEmployees'
         verbose_name = "M2M Человек-Филиал"
@@ -253,5 +261,27 @@ class BranchOfficeEmployees(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['employee', 'branchOffice'],
                                     name='unique_employee_branch_office')
+        ]
+
+# Аккаунты работников филиала
+class BranchOfficeAccounts(models.Model):
+    branchOffice = models.ForeignKey(BranchOffice,
+                                     on_delete=models.RESTRICT,
+                                     verbose_name='Филиал')
+    account = models.ForeignKey('Account',
+                                on_delete=models.RESTRICT,
+                                verbose_name='Аккаунт')
+    employee = models.ForeignKey('IndividualEntity',
+                                 null = True,
+                                 default = None,
+                                 on_delete=models.RESTRICT,
+                                 verbose_name='Владелец аккаунта')
+    class Meta:
+        db_table = 'BranchOfficeAccounts'
+        verbose_name = "M2M Аккаунт-Филиал"
+        verbose_name_plural = "M2M Аккаунт-Филиал"
+        constraints = [
+            models.UniqueConstraint(fields=['account', 'branchOffice'],
+                                    name='unique_account_branch_office')
         ]
 #endregion Филиал

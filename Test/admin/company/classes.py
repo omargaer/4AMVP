@@ -18,8 +18,9 @@ from .inlines import (BranchOfficeInline,
                       CompanyGroupDecisionMakerInline,
                       CompanyDecisionMakerInline,
                       CompanyPositionInline,
-                      BranchOfficeEmployeesInline,
-                      BranchOfficeScheduleInline)
+                      BranchOfficeScheduleInline,
+                      EmployeesInline,
+                      AccountsInline)
 
 
 @admin.register(CompanyGroup)
@@ -85,7 +86,8 @@ class BranchOfficeAdmin(admin.ModelAdmin):
     fields = ('company', 'type', 'status', 'phone', 'note', 'street', 'building')
     inlines = [BranchOfficeLocationInline,
                BranchOfficeScheduleInline,
-               BranchOfficeEmployeesInline,]
+               EmployeesInline,
+               AccountsInline]
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

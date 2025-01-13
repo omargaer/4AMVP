@@ -12,7 +12,8 @@ from Test.models.companies_models import (
     BranchOffice,
     BranchOfficeLocation,
     BranchOfficeSchedule,
-    BranchOfficeEmployees
+    BranchOfficeEmployees,
+    BranchOfficeAccounts
 )
 
 # region Инлайны группы компаний
@@ -60,12 +61,12 @@ class CompanyPositionInline(admin.TabularInline):
 # endregion Инлайны компаний
 
 # region Инлайны филиалов
-class BranchOfficeEmployeesInline(admin.TabularInline):
-    model = BranchOfficeEmployees
-    extra = 1
-    verbose_name = "Работник филиала"
-    verbose_name_plural = "Работники филиала"
-    fields = ('employee',)
+# class BranchOfficeEmployeesInline(admin.TabularInline):
+#     model = BranchOfficeEmployees
+#     extra = 0
+#     verbose_name = "Работник филиала"
+#     verbose_name_plural = "Работники филиала"
+#     fields = ('employee',)
 
 class BranchOfficeLocationInline(admin.TabularInline):
     model = BranchOfficeLocation
@@ -110,4 +111,19 @@ class BranchOfficeScheduleInline(admin.TabularInline):
     formset = UniqueDayFormSet
     ordering = ['day_of_week']
 
+class EmployeesInline(admin.TabularInline):
+    model = BranchOfficeEmployees
+    extra = 0
+    fields = ('employee', 'position',)
+    verbose_name = 'Работник'
+    verbose_name_plural = 'Работники'
+
+    def position(self, obj):
+        return obj.position.name
+
+class AccountsInline(admin.TabularInline):
+    model = BranchOfficeAccounts
+    extra = 0
+    verbose_name = 'Аккаунт работника'
+    verbose_name_plural = 'Аккаунты работников'
 # endregion Инлайны филиалов

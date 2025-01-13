@@ -75,11 +75,6 @@ class Account(AbstractUser):
                                    on_delete=models.RESTRICT,
                                    verbose_name="Связанное физическое лицо",
                                    related_name='accounts')
-    position = models.ForeignKey('Position',
-                                 on_delete=models.RESTRICT,
-                                 null=True,
-                                 default=None,
-                                 verbose_name="Должность")
     status = models.ForeignKey(AccountStatus,
                                on_delete=models.RESTRICT,
                                # TODO: потом изменить
@@ -101,7 +96,10 @@ class Account(AbstractUser):
                             null=True,
                             default=None,
                             verbose_name="Примечания")
-
+    branchOffice = models.ManyToManyField('BranchOffice',
+                                        through='BranchOfficeAccounts',
+                                        related_name='accounts',
+                                        verbose_name='Филиал')
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='account_groups',

@@ -2,14 +2,11 @@ from django import forms
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from Test.models import (Application,
-                         BranchOffice,
-                         IndividualEntity,
                          ApplicationSubject,
-                         Device,
-                         BranchOfficeLocation,
                          ApplicationActions,
                          ApplicationStatusHistory,
-                         ApplicationSLA)
+                         ApplicationSLA,
+                         MaintenanceAction)
 
 # Переопределённая форма изменения\создания заявки
 class ApplicationForm(forms.ModelForm):
@@ -136,3 +133,30 @@ class ApplicationSLAForm(forms.ModelForm):
         if commit:
             instance.save()  # Сохраняем объект
         return instance  # Возвращаем сохранённый объект
+
+# Форма для действий с оборудованием по заявке
+class MaintenanceActionForm(forms.ModelForm):
+    class Meta:
+        model = MaintenanceAction
+        fields = ['device', 'hardware', 'description']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 2, 'cols': 40}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        device = cleaned_data.get('device')
+        hardware = cleaned_data.get('hardware')
+
+        # Проверяем, что заполнено только одно из полей
+        if device and hardware:
+            raise ValidationError(
+                'Нельзя одновременно выбрать устройство и оборудование. Выберите что-то одно.'
+            )
+
+        if not device and not hardware:
+            raise ValidationError(
+                'Необходимо выбрать либо устройство, либо оборудование.'
+            )
+
+        return cleaned_data

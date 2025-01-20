@@ -53,13 +53,13 @@ class CompanyAdmin(admin.ModelAdmin):
             return db_field.formfield(required=False, **kwargs)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-@admin.register(Position)
-class PositionAdmin(admin.ModelAdmin):
-    list_display = ('company', 'name', 'note')
-    search_fields = ('name',)
-    list_filter = ('company',)
-    ordering = ('name',)
-    fields = ('company', 'name', 'note')
+# @admin.register(Position)
+# class PositionAdmin(admin.ModelAdmin):
+#     list_display = ('company', 'name', 'note')
+#     search_fields = ('name',)
+#     list_filter = ('company',)
+#     ordering = ('name',)
+#     fields = ('company', 'name', 'note')
 
 # @admin.register(BranchOfficeType)
 # class BranchOfficeTypeAdmin(admin.ModelAdmin):
@@ -100,17 +100,17 @@ class BranchOfficeAdmin(admin.ModelAdmin):
             'branchofficeemployees_set__position'
         )
 
-@admin.register(BranchOfficeLocation)
-class BranchOfficeLocationAdmin(admin.ModelAdmin):
-    list_display = ('branchOffice',  'floor', 'room', 'room_name')
-    search_fields = ('branchOffice__company__name', 'room', 'floor', 'room_name')
-    list_filter = ['branchOffice']
-    ordering = ['branchOffice__company__name']
-    fields = ('branchOffice', 'floor', 'room', 'room_name')
-
-@admin.register(BranchOfficeSchedule)
-class BranchOfficeScheduleAdmin(admin.ModelAdmin):
-    list_display = ('branchOffice', 'day_of_week', 'opening_time', 'closing_time')
-    list_filter = ('branchOffice', 'day_of_week')
-    ordering = ('branchOffice', 'day_of_week')
-    fields = ('branchOffice', 'day_of_week', 'opening_time', 'closing_time')
+# @admin.register(BranchOfficeLocation)
+# class BranchOfficeLocationAdmin(admin.ModelAdmin):
+#     list_display = ('branchOffice',  'floor', 'room', 'room_name')
+#     search_fields = ('branchOffice__company__name', 'room', 'floor', 'room_name')
+#     list_filter = ['branchOffice']
+#     ordering = ['branchOffice__company__name']
+#     fields = ('branchOffice', 'floor', 'room', 'room_name')
+#
+# @admin.register(BranchOfficeSchedule)
+# class BranchOfficeScheduleAdmin(admin.ModelAdmin):
+#     list_display = ('branchOffice', 'day_of_week', 'opening_time', 'closing_time')
+#     list_filter = ('branchOffice', 'day_of_week')
+#     ordering = ('branchOffice', 'day_of_week')
+#     fields = ('branchOffice', 'day_of_week', 'opening_time', 'closing_time')

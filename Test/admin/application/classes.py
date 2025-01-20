@@ -1,25 +1,24 @@
 from django.contrib import admin
 
-from Test.admin.application.inlines import (ApplicationActionsInline,
+from .inlines import (ApplicationActionsInline,
                                             ApplicationSubjectInline,
                                             ApplicationStatusHistoryInline,
                                             ApplicationSLAInline,
                                             ApplicationMessagesInline,
-                                            ApplicationFilesInline)
+                                            ApplicationFilesInline,
+                                            MaintenanceActionInline)
 from Test.forms import ApplicationForm
 
-from Test.models.application_models import (
-    ApplicationType,
-    Application,
-    ApplicationSubject,
-    ApplicationPriority,
-    ApplicationSLA,
-    ApplicationStatus,
-    ApplicationActions,
-    ApplicationFiles,
-    ApplicationMessages,
-    ApplicationStatusHistory
-)
+from Test.models.application_models import (ApplicationType,
+                                            Application,
+                                            ApplicationSubject,
+                                            ApplicationPriority,
+                                            ApplicationSLA,
+                                            ApplicationStatus,
+                                            ApplicationActions,
+                                            ApplicationFiles,
+                                            ApplicationMessages,
+                                            ApplicationStatusHistory)
 
 # Заявка
 @admin.register(Application)
@@ -44,7 +43,8 @@ class ApplicationAdmin(admin.ModelAdmin):
                ApplicationSubjectInline,
                ApplicationActionsInline,
                ApplicationMessagesInline,
-               ApplicationFilesInline]
+               ApplicationFilesInline,
+               MaintenanceActionInline]
     class Media:
         js = ('admin/js/application.js',)
 

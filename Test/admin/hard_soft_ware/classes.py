@@ -10,19 +10,20 @@ from Test.models.hard_soft_ware_models import (
     Hardware,
     MaintenanceAction
 )
+from .inlines import *
 
-@admin.register(DeviceType)
-class DeviceTypeAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    fields = ('name',)
-
-@admin.register(DevicePlacementMethod)
-class DevicePlacementMethodAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    fields = ('name',)
-
+# @admin.register(DeviceType)
+# class DeviceTypeAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
+#     fields = ('name',)
+#
+# @admin.register(DevicePlacementMethod)
+# class DevicePlacementMethodAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
+#     fields = ('name',)
+#
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
@@ -31,7 +32,9 @@ class DeviceAdmin(admin.ModelAdmin):
         'factoryNumber',
         'responsiblePerson',
         'branchOfficeLocation',
-        'placement'
+        'placement',
+        'purchaseDate',
+        'warrantyExpirationDate'
     )
     search_fields = (
         'type__name',
@@ -42,19 +45,23 @@ class DeviceAdmin(admin.ModelAdmin):
     )
     list_filter = ('type', 'placement', 'branchOfficeLocation')
     fields = (
+        'name',
+        'branchOfficeLocation',
         'type',
+        'responsiblePerson',
+        'placement',
         'inventoryNumber',
         'factoryNumber',
-        'responsiblePerson',
-        'branchOfficeLocation',
-        'placement'
+        'purchaseDate',
+        'warrantyExpirationDate'
     )
-
-@admin.register(SoftwareType)
-class SoftwareTypeAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    fields = ('name',)
+    inlines = [SoftwareInline, HardwareInline, MaintenanceActionInline]
+#
+# @admin.register(SoftwareType)
+# class SoftwareTypeAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
+#     fields = ('name',)
 
 @admin.register(Software)
 class SoftwareAdmin(admin.ModelAdmin):
@@ -65,6 +72,7 @@ class SoftwareAdmin(admin.ModelAdmin):
         'price',
         'license_key',
         'purchaseDate',
+        'installationDate',
         'licenseActivationDate',
         'licenseExpirationDate'
     )
@@ -82,15 +90,16 @@ class SoftwareAdmin(admin.ModelAdmin):
         'price',
         'license_key',
         'purchaseDate',
+        'installationDate',
         'licenseActivationDate',
         'licenseExpirationDate'
     )
 
-@admin.register(HardwareType)
-class HardwareTypeAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    fields = ('name',)
+# @admin.register(HardwareType)
+# class HardwareTypeAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
+#     fields = ('name',)
 
 @admin.register(Hardware)
 class HardwareAdmin(admin.ModelAdmin):
@@ -124,29 +133,27 @@ class HardwareAdmin(admin.ModelAdmin):
         'installationDate',
         'warrantyExpirationDate'
     )
+    inlines= [MaintenanceActionInline]
 
-@admin.register(MaintenanceAction)
-class MaintenanceActionAdmin(admin.ModelAdmin):
-    list_display = (
-        'action_type',
-        'device',
-        'hardware',
-        'action_date',
-        'contractor'
-    )
-    search_fields = (
-        'action_type',
-        'device__type__name',
-        'hardware__modelName',
-        'contractor__full_name'
-    )
-    list_filter = ('action_type', 'contractor')
-    readonly_fields = ('action_date',)  # Make action_date read-only
-    fields = (
-        'device',
-        'hardware',
-        'action_type',
-        'description',
-        'contractor',
-        'action_date',  # Optional: Include in fields to display it
-    )
+# @admin.register(MaintenanceAction)
+# class MaintenanceActionAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'device',
+#         'hardware',
+#         'action_date',
+#         'contractor'
+#     )
+#     search_fields = (
+#         'device__type__name',
+#         'hardware__modelName',
+#         'contractor__full_name'
+#     )
+#     list_filter = ['contractor']
+#     readonly_fields = ('action_date',)
+#     fields = (
+#         'device',
+#         'hardware',
+#         'description',
+#         'contractor',
+#         'action_date',
+#     )

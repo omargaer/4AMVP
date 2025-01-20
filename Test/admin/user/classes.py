@@ -19,17 +19,17 @@ class IndividualEntityAdmin(admin.ModelAdmin):
 
     inlines = [CompanyEmployeesInline]
 
-@admin.register(AccountStatus)
-class AccountStatusAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    fields = ('name',)
-
-@admin.register(AccountRole)
-class AccountRoleAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    fields = ('name',)
+# @admin.register(AccountStatus)
+# class AccountStatusAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
+#     fields = ('name',)
+#
+# @admin.register(AccountRole)
+# class AccountRoleAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
+#     fields = ('name',)
 
 
 @admin.register(Account)

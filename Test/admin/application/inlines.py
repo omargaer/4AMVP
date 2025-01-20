@@ -1,24 +1,43 @@
 from django.contrib import admin
+from django.contrib.admin.widgets import AdminTextareaWidget
+
 from Test.models import (ApplicationActions,
                          ApplicationSubject,
                          ApplicationStatusHistory,
                          ApplicationSLA,
                          ApplicationFiles,
-                         ApplicationMessages)
+                         ApplicationMessages,
+                         MaintenanceAction)
 from Test.forms import (ApplicationSubjectForm,
                        ApplicationStatusHistoryForm,
-                       ApplicationSLAForm)
+                       ApplicationSLAForm,
+                       MaintenanceActionForm)
 
-# Действия
+# Действия по заявке
 class ApplicationActionsInline(admin.TabularInline):
     model = ApplicationActions
     fields = ('timestamp', 'content')
     readonly_fields = ('timestamp',)
     can_delete = False
     show_change_link = False
-    verbose_name = 'Действие заявки'
-    verbose_name_plural = 'Действия заявки'
+    verbose_name = 'Действие по заявке'
+    verbose_name_plural = 'Действия по заявке'
     extra = 0
+
+# Действия с оборудованием
+class MaintenanceActionInline(admin.TabularInline):
+    model = MaintenanceAction
+    form = MaintenanceActionForm
+    extra = 0
+    fields = ('device', 'hardware', 'description')
+    readonly_fields = ( )
+    verbose_name = 'Действие с оборудованием'
+    verbose_name_plural = 'Действия с оборудованием'
+    def has_add_permission(self, request, obj=None):
+        return True
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 # Предметы
 class ApplicationSubjectInline(admin.TabularInline):

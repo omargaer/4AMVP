@@ -143,8 +143,9 @@ class BranchOffice(models.Model):
                                 verbose_name="Компания")
     type = models.ForeignKey(BranchOfficeType,
                              on_delete=models.RESTRICT,
-                             null=False,
+                             null=True,
                              default=None,
+                             blank=True,
                              verbose_name="Тип филиала")
     status = models.ForeignKey(BranchOfficeStatus,
                                on_delete=models.RESTRICT,

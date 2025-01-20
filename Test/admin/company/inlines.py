@@ -1,6 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib import admin
+from django.utils.html import format_html
+
 from Test.models.companies_models import (
     CompanyGroup,
     CompanyGroupDecisionMaker,
@@ -38,9 +40,10 @@ class BranchOfficeInline(admin.TabularInline):
     """
     Inline-класс для отображения и редактирования филиалов компании в интерфейсе админки.
     """
+    extra = 0
     model = BranchOffice
-    fields = ('type', 'status', 'phone', 'note', 'street', 'building')
-    show_change_link = True  # Добавляет ссылку на редактирование филиала отдельно
+    fields = ('type', 'status', 'phone', 'street', 'building')
+
 
 class CompanyDecisionMakerInline(admin.StackedInline):
     model = CompanyDecisionMaker
@@ -61,12 +64,6 @@ class CompanyPositionInline(admin.TabularInline):
 # endregion Инлайны компаний
 
 # region Инлайны филиалов
-# class BranchOfficeEmployeesInline(admin.TabularInline):
-#     model = BranchOfficeEmployees
-#     extra = 0
-#     verbose_name = "Работник филиала"
-#     verbose_name_plural = "Работники филиала"
-#     fields = ('employee',)
 
 class BranchOfficeLocationInline(admin.TabularInline):
     model = BranchOfficeLocation

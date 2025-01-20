@@ -8,6 +8,7 @@ from Test.models.user_models import (
     AccountRole,
     Account
 )
+from .inlines import (CompanyEmployeesInline)
 
 @admin.register(IndividualEntity)
 class IndividualEntityAdmin(admin.ModelAdmin):
@@ -15,6 +16,8 @@ class IndividualEntityAdmin(admin.ModelAdmin):
     search_fields = ('full_name', 'INIPA', 'ITN')
     list_filter = ('gender',)
     fields = ('full_name', 'INIPA', 'ITN', 'gender')
+
+    inlines = [CompanyEmployeesInline]
 
 @admin.register(AccountStatus)
 class AccountStatusAdmin(admin.ModelAdmin):
@@ -28,12 +31,6 @@ class AccountRoleAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     fields = ('name',)
 
-# class BranchOfficeEmployeesInline(admin.TabularInline):
-#     model = BranchOfficeEmployees
-#     extra = 1
-#     autocomplete_fields = ['branchOffice']
-#     verbose_name = 'Филиал сотрудника'
-#     verbose_name_plural = 'Филиалы сотрудников'
 
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
@@ -46,14 +43,13 @@ class AccountAdmin(UserAdmin):
     # Переопределение fieldsets без first_name и last_name
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Права доступа', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-        }),
-        ('Важные даты', {'fields': ('last_login', 'date_joined')}),
-        ('Дополнительные поля', {
+        # ('Права доступа', {
+        #     'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        # }),
+        # ('Важные даты', {'fields': ('last_login', 'date_joined')}),
+        ('Дополнительная информация', {
             'fields': (
                 'individual_entity',
-                'position',
                 'status',
                 'role',
                 'phone',
@@ -76,7 +72,6 @@ class AccountAdmin(UserAdmin):
                 'groups',
                 'user_permissions',
                 'individual_entity',
-                'position',
                 'status',
                 'role',
                 'phone',

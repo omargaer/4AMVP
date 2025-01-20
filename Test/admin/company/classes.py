@@ -91,7 +91,14 @@ class BranchOfficeAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.select_related('company', 'type', 'status').prefetch_related('branchofficeemployees_set__employee__accounts__position')
+        return qs.select_related(
+            'company',
+            'type',
+            'status'
+        ).prefetch_related(
+            'branchofficeemployees_set__employee',
+            'branchofficeemployees_set__position'
+        )
 
 @admin.register(BranchOfficeLocation)
 class BranchOfficeLocationAdmin(admin.ModelAdmin):

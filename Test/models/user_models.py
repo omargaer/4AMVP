@@ -9,18 +9,21 @@ class IndividualEntity(models.Model):
     INIPA = models.CharField(max_length=11,
                              verbose_name="Снилс",
                              null=True,
+                             blank=True,
                              default='')
     # ИНН
     ITN = models.CharField(max_length=12,
                            null=True,
                            default='',
+                           blank=True,
                            verbose_name="ИНН")
     GENDERS = [(0, 'Мужчина'),
                (1, 'Женщина'),
                (2, 'Не указан')]
     gender = models.IntegerField(choices=GENDERS,
                                  verbose_name="Пол",
-                                 null=False,
+                                 null=True,
+                                 blank=True,
                                  default=2)
     workplaces = models.ManyToManyField('BranchOffice',
                                         through='BranchOfficeEmployees',
@@ -91,8 +94,8 @@ class Account(AbstractUser):
                              null=True,
                              default="",
                              verbose_name="Телефон")
-
-    note = models.TextField(blank=True,
+    note = models.CharField(max_length=120,
+                            blank=True,
                             null=True,
                             default=None,
                             verbose_name="Примечания")
